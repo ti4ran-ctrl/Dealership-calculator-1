@@ -33,8 +33,13 @@ input.bad{border-color:var(--bad)}
 .ov{position:absolute;inset:0;display:flex;align-items:center;padding-inline:16px;pointer-events:none;direction:rtl}
 .mir{font-size:1.1rem;font-weight:700;visibility:hidden;white-space:pre}
 .ov b{color:var(--gold);margin-inline-start:6px}
-#kb{position:fixed;left:0;right:0;bottom:0;display:none;padding:8px 12px;background:var(--card2);border-top:1px solid var(--line);z-index:50;box-shadow:0 -6px 16px rgba(0,0,0,.25)}
-#kb.show{display:block}#kb button{width:100%}
+#kb{position:fixed;left:0;right:0;bottom:0;display:none;height:46px;padding:0 14px;align-items:center;justify-content:center;background:#d1d4db;z-index:50}
+@media (prefers-color-scheme:dark){#kb{background:#2b2d36}}
+#kb,#kb.show{display:none!important}#kb button{width:auto;background:linear-gradient(180deg,#fde68a,#fbbf24 45%,#d97706);color:#1c1202;font-weight:800;font-size:1rem;padding:6px 30px;border-radius:12px;box-shadow:0 3px 0 #92400e,0 1px 0 rgba(255,255,255,.6) inset}#kb button:active{transform:translateY(3px);box-shadow:0 0 0 #92400e}
+.nt{background:rgba(251,191,36,.12);color:var(--gold);border:1px solid rgba(251,191,36,.35)}
+.ok{display:none;position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:30;padding:8px 22px;font-size:.9rem}
+.ok:active{transform:translateX(-50%) translateY(4px)}
+.ok{display:none!important}
 input[type=range]{padding:0;height:8px;border-radius:6px;background:var(--inp);-webkit-appearance:none;appearance:none;margin-top:10px;box-shadow:0 2px 4px rgba(0,0,0,.35) inset}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fde68a,var(--gold2));box-shadow:0 3px 0 #92400e,0 6px 10px rgba(0,0,0,.4)}
 input[type=range]::-moz-range-thumb{width:26px;height:26px;border:0;border-radius:50%;background:var(--gold2);box-shadow:0 3px 0 #92400e}
@@ -105,15 +110,15 @@ tr.last td{font-weight:800;color:var(--gold)}
    <div class="card">
     <h2>📋 פרטי העסקה</h2>
     <label for="price">מחיר מחירון בסיס (לאחר הפחתות)</label>
-    <div class="cur"><input id="price" class="num" inputmode="numeric" value="120,000"><div class="ov"><span class="mir"></span><b>₪</b></div></div>
+    <div class="cur"><input id="price" class="num" inputmode="numeric" value=""><div class="ov"><span class="mir"></span><b>₪</b></div></div>
     <label for="loan">סכום ההלוואה</label>
-    <div class="cur"><input id="loan" class="num" inputmode="numeric" value="100,000"><div class="ov"><span class="mir"></span><b>₪</b></div></div>
+    <div class="cur"><input id="loan" class="num" inputmode="numeric" value=""><div class="ov"><span class="mir"></span><b>₪</b></div></div>
     <div class="lim" id="ltv"></div>
     <div class="f"><label for="months">תקופת ההלוואה (חודשים)</label><label id="mv" style="color:var(--gold)"></label></div>
     <div class="cur ns"><input id="months" class="num" inputmode="numeric" value="60"></div>
     <input type="range" id="slider" min="12" max="100" value="60" aria-label="חודשים">
     <label for="bal">סכום הבלון בסוף התקופה</label>
-    <div class="cur"><input id="bal" class="num" inputmode="numeric" value="30,000"><div class="ov"><span class="mir"></span><b>₪</b></div></div>
+    <div class="cur"><input id="bal" class="num" inputmode="numeric" value=""><div class="ov"><span class="mir"></span><b>₪</b></div></div>
     <div class="lim" id="balmax"></div>
    </div>
   </div>
@@ -142,6 +147,8 @@ tr.last td{font-weight:800;color:var(--gold)}
   <ul class="notes"><li>ההצעה כפופה לאישור סופי של הגוף המממן.</li><li>הסימולציה להמחשה בלבד; הנתונים עשויים להשתנות לפי נתוני הלקוח והגוף המממן.</li><li>במסלול מדד לא נכלל חישוב הצמדה למדד המחירים לצרכן.</li><li>ייצוא ל-PDF: בחלון ההדפסה בחרו ״שמירה כ-PDF״.</li><li>לוח סילוקין להמחשה בלבד.</li><li>כל הזכויות שמורות לקרדיבל פלוס בע״מ.</li></ul>
  </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <div id="kb"><button type="button" id="kbok">✓ אישור</button></div>
 <script>
 const L={2016:{t:[[24,0]],x:'ללא בלון, עד 24 תשלומים'},2017:{t:[[36,0]],x:'ללא בלון, עד 36 תשלומים'},2018:{t:[[36,.35],[48,.30]],x:'48 תשלומים/30% בלון, 36 תשלומים/35% בלון, עד 48 תשלומים'},2019:{t:[[36,.35],[48,.30],[60,0]],x:'48 תשלומים/30% בלון, 36 תשלומים/35% בלון, עד 60 תשלומים'},2020:{t:[[36,.50],[48,.40],[72,0]],x:'48 תשלומים/40% בלון, 36 תשלומים/50% בלון, עד 72 תשלומים'},2021:{t:[[48,.40],[60,.35],[84,0]],x:'60 תשלומים/35% בלון, 48 תשלומים/40% בלון, עד 84 תשלומים'},2022:{t:[[48,.50],[60,.40],[84,0]],x:'60 תשלומים/40% בלון, 48 תשלומים/50% בלון, עד 84 תשלומים'},2023:{t:[[60,.50],[100,0]],x:'60 תשלומים/50% בלון, עד 100 תשלומים'}};
@@ -173,16 +180,17 @@ function calc(){
  if(m<1)errs.push('יש להזין תקופה של חודש לפחות');
  if(m>mx)errs.push(`תקופת ההלוואה חורגת מהמותר: עד ${mx} תשלומים`);
  if(loan<=0)errs.push('יש להזין סכום הלוואה');
- if(loan>price)errs.push('סכום ההלוואה גבוה ממחיר הרכב');
+ if(price<=0)errs.push('יש להזין מחיר רכב');
+ if(price>0&&loan>price)errs.push('סכום ההלוואה גבוה ממחיר הרכב');
  if(bal>=loan&&loan>0)errs.push('הבלון חייב להיות נמוך מסכום ההלוואה');
- if(bal>price*pct+.005)errs.push(pct?`הבלון חורג: ל-${m} תשלומים מותר עד ${(pct*100).toFixed(0)}% (${cur(price*pct)})`:`בתקופה של ${m} תשלומים לא ניתן לקבל בלון`);
- const bad=errs.length>0;
- $('status').className=bad?'no':'ok';
- $('status').textContent=bad?'⛔ '+errs[0]:'✅ התקופה והבלון עומדים בתנאי המגבלות';
- $('loan').classList.toggle('bad',loan>price||loan<=0);
+ if(price>0&&bal>price*pct+.005)errs.push(pct?`הבלון חורג: ל-${m} תשלומים מותר עד ${(pct*100).toFixed(0)}% (${cur(price*pct)})`:`בתקופה של ${m} תשלומים לא ניתן לקבל בלון`);
+ const bad=errs.length>0,blank=!price&&!loan&&!bal;
+ $('status').className=blank?'nt':bad?'no':'ok';
+ $('status').textContent=blank?'ℹ️ הזינו מחיר רכב וסכום הלוואה לחישוב':bad?'⛔ '+errs[0]:'✅ התקופה והבלון עומדים בתנאי המגבלות';
+ $('loan').classList.toggle('bad',(loan>price&&price>0)||(loan<=0&&!blank));
  $('bal').classList.toggle('bad',bal>price*pct+.005||(bal>=loan&&loan>0));
  $('months').classList.toggle('bad',m>mx||m<1);
- const P=pmt(loan,bal,m,r),fee=(loan*.015+380)*1.18,reg=P*m,intr=reg+bal-loan;
+ const P=pmt(loan,bal,m,r),fee=loan>0?(loan*.015+380)*1.18:0,reg=P*m,intr=reg+bal-loan;
  $('pay').textContent=cur(P);$('fee').textContent=cur(fee);
  const a=pmt(loan,bal,m,rate(type,'פריים')[1]),b=pmt(loan,bal,m,rate(type,'מדד')[1]);
  $('cP').querySelector('b').textContent=cur(a);$('cI').querySelector('b').textContent=cur(b);
@@ -198,7 +206,7 @@ $('months').addEventListener('input',calc);
 $('slider').addEventListener('input',e=>{$('months').value=e.target.value;calc()});
 ['type','year','track'].forEach(i=>$(i).addEventListener('change',calc));
 $('tg').addEventListener('click',()=>$('schedCard').scrollIntoView({behavior:'smooth'}));
-$('pdf').addEventListener('click',()=>{$('pdfHead').textContent=`מחשבון מימון רכב מתקדם | ${$('type').value}${$('type').value==='יד 2'?' '+yr.value:''} | מסלול ${$('track').value} | הופק ב-${new Date().toLocaleDateString('he-IL')}`;window.print()});
+$('pdf').addEventListener('click',()=>{$('pdfHead').textContent=`מחשבון מימון רכב מתקדם | ${$('type').value}${$('type').value==='יד 2'?' '+yr.value:''} | מסלול ${$('track').value} | הופק ב-${new Date().toLocaleDateString('he-IL')}`;makePdf()});
 
 // 3D tilt on pointer devices
 if(matchMedia('(hover:hover)').matches)document.querySelectorAll('.card').forEach(c=>{
@@ -206,15 +214,51 @@ if(matchMedia('(hover:hover)').matches)document.querySelectorAll('.card').forEac
  c.addEventListener('mouseleave',()=>c.style.transform='');
 });
 const kb=$('kb'),vv=window.visualViewport;
-function posKb(){const o=vv?window.innerHeight-(vv.height+vv.offsetTop):0;kb.style.bottom=Math.max(0,o)+'px'}
+let visBottom=null,visH=0;const embedded=window.self!==window.top;
+const sent=document.createElement('div');sent.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;visibility:hidden';document.body.appendChild(sent);
+if('IntersectionObserver' in window)new IntersectionObserver(es=>{const e=es[es.length-1];visBottom=e.isIntersecting?e.intersectionRect.bottom:null;visH=e.isIntersecting?e.intersectionRect.height:0;if(kb.classList.contains('show'))posKb()},{threshold:Array.from({length:1001},(_,i)=>i/1000)}).observe(sent);
+function kbEst(){const sh=Math.max(screen.height,screen.width);return Math.round(sh*(sh>=800?.354:.39))}
+function posKb(){if(embedded&&visBottom!=null){const clipped=visH<screen.height*.75;const bot=clipped?visBottom-36:visBottom-kbEst();kb.style.bottom='auto';kb.style.top=(bot-46+2)+'px';return}const d=vv?window.innerHeight-(vv.height+vv.offsetTop):0;kb.style.top='auto';kb.style.bottom=((d>120?d:kbEst())-2)+'px'}
 const isF=n=>n&&n.matches&&n.matches('.cur input');
-document.addEventListener('focusin',e=>{if(isF(e.target)){kb.classList.add('show');posKb();setTimeout(posKb,300)}});
-document.addEventListener('focusout',()=>setTimeout(()=>{if(!isF(document.activeElement))kb.classList.remove('show')},60));
+document.querySelectorAll('.cur').forEach(c=>{const b=document.createElement('button');b.type='button';b.className='ok';b.textContent='✓ אישור';b.addEventListener('pointerdown',e=>e.preventDefault());b.addEventListener('click',()=>document.activeElement&&document.activeElement.blur());c.appendChild(b)});
+document.addEventListener('focusin',e=>{if(isF(e.target)&&matchMedia('(pointer:coarse)').matches){kb.classList.add('show');posKb();[350,700].forEach(t=>setTimeout(posKb,t));setTimeout(()=>{try{e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(_){}},400)}});
+document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;document.querySelectorAll('.cur.fk').forEach(c=>{if(!a||a.parentNode!==c)c.classList.remove('fk')});if(!isF(a))kb.classList.remove('show')},60));
 if(vv)['resize','scroll'].forEach(ev=>vv.addEventListener(ev,posKb));
 $('kbok').addEventListener('pointerdown',e=>e.preventDefault());
 $('kbok').addEventListener('click',()=>document.activeElement&&document.activeElement.blur());
 const mir=()=>document.querySelectorAll('.cur').forEach(c=>{const m=c.querySelector('.mir');if(m)m.textContent=c.querySelector('input').value});
 document.addEventListener('input',mir);mir();
+async function makePdf(){
+ const btn=$('pdf'),old=btn.textContent;
+ if($('status').className!=='ok'){btn.textContent='⛔ תקנו את הנתונים';setTimeout(()=>btn.textContent=old,2000);return}
+ if(typeof html2canvas==='undefined'||!window.jspdf){window.print();return}
+ btn.disabled=true;btn.textContent='⏳ מכין PDF…';
+ let rep;
+ try{
+  const used=$('type').value==='יד 2';
+  const rows=[['סוג הרכב',$('type').value+(used?' '+yr.value:'')],['מסלול ריבית',$('track').value+' ('+$('rdesc').textContent+')'],['מחיר מחירון בסיס',$('price').value+' ₪'],['סכום ההלוואה',$('loan').value+' ₪'],['תקופה',$('months').value+' חודשים'],['בלון',($('bal').value||'0')+' ₪'],['החזר חודשי משוער',$('pay').textContent],['עמלת הקמה, שעבוד ומשכון',$('fee').textContent]];
+  rep=document.createElement('div');
+  rep.style.cssText='position:fixed;left:-10000px;top:0;width:794px;background:#fff;color:#111;font-family:Heebo,Arial,sans-serif;direction:rtl;padding:32px;box-sizing:border-box';
+  rep.innerHTML=`<style>.r table{width:100%;min-width:0;border-collapse:collapse;direction:rtl;font-size:13px}.r td,.r th{border:1px solid #ddd;padding:6px 8px;text-align:center;color:#111}.r th{position:static;background:#f1f1f1;color:#111}.r tr.last td{color:#92400e}.r tbody tr:nth-child(even){background:#fafafa}.s td:first-child{background:#f7f7f7;font-weight:700;text-align:right;width:40%}.s td:last-child{text-align:right;direction:rtl}</style><div class="r"><h1 style="font-size:26px;margin:0 0 4px;color:#111">מחשבון מימון רכב מתקדם</h1><div style="font-size:12px;color:#555;margin-bottom:14px">הופק ב-${new Date().toLocaleDateString('he-IL')}</div><table class="s"><tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table><h2 style="font-size:17px;margin:20px 0 8px;color:#111">לוח סילוקין</h2><table><thead><tr><th>#</th><th>החזר חודשי</th><th>קרן</th><th>ריבית</th><th>יתרה</th></tr></thead><tbody>${$('tb').innerHTML}</tbody></table><h2 style="font-size:15px;margin:20px 0 6px;color:#111">הערות חשובות</h2><ul style="font-size:12px;color:#444;line-height:1.8;padding:0 18px 0 0;margin:0">${document.querySelector('.notes').innerHTML}</ul></div>`;
+  document.body.appendChild(rep);
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+  const canvas=await html2canvas(rep,{scale:2,backgroundColor:'#ffffff',useCORS:true});
+  const pdf=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+  const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
+  const pageH=Math.floor(canvas.width*ph/pw);
+  for(let y=0,first=true;y<canvas.height;y+=pageH){
+   const h=Math.min(pageH,canvas.height-y),c=document.createElement('canvas');
+   c.width=canvas.width;c.height=h;
+   const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,h);x.drawImage(canvas,0,y,canvas.width,h,0,0,canvas.width,h);
+   if(!first)pdf.addPage();first=false;
+   pdf.addImage(c.toDataURL('image/jpeg',.92),'JPEG',0,0,pw,h*pw/canvas.width);
+  }
+  const name='car-finance-'+new Date().toISOString().slice(0,10)+'.pdf',blob=pdf.output('blob');
+  let d=null;try{d=window.claude&&await window.claude.use('downloads')}catch(e){}
+  if(d){try{await d.save({filename:name,data:blob})}catch(e){if(!e||e.code!=='declined')pdf.save(name)}}else pdf.save(name);
+ }catch(e){console.error(e);window.print()}
+ finally{if(rep&&rep.parentNode)rep.parentNode.removeChild(rep);btn.disabled=false;btn.textContent=old}
+}
 ['price','loan','bal','months'].forEach(i=>{const e=$(i);e.setAttribute('enterkeyhint','done');e.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();e.blur()}})});
 calc();
 </script>
